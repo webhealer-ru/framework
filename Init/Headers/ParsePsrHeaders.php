@@ -11,6 +11,8 @@ namespace Hleb\Init\Headers;
  */
 class ParsePsrHeaders
 {
+    private const MAX_HEADER_ITEMS = 128;
+    
     public function update(mixed $headers): array
     {
         if (empty($headers)) {
@@ -28,14 +30,21 @@ class ParsePsrHeaders
         foreach ($headers as $name => $header) {
             if (!\is_array($header)) {
                 $items = [];
+                $seen = [];
                 $header = \trim((string)$header);
-                foreach (\explode(',', $header) as $p) {
-                    $r = \trim($p);
-                    if (!\in_array($r, $items)) {
-                        $items[] = $r;
+                if ($header !== '') {
+                    foreach (\explode(',', $header, self::MAX_HEADER_ITEMS + 1) as $p) {
+                        $r = \trim($p);
+                        if ($r === '') {
+                            continue;
+                        }
+                        if (!isset($seen[$r])) {
+                            $seen[$r] = true;
+                            $items[] = $r;
+                        }
                     }
                 }
-                $headers[$name] = $items;
+                $headers[$name] = $items;                
             }
         }
         return $headers;
