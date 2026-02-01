@@ -195,7 +195,14 @@ final class SystemSettings extends BaseSingleton
         }
         // May not be obvious, but realpath may return false.
         // Может быть неочевидным, но realpath может вернуть false.
-        return $ifExists ? \realpath($path) . (\str_ends_with($path, '/') ? DIRECTORY_SEPARATOR : '') : $path;
+        if (!$ifExists) {
+            return $path;
+        }
+        $real = \realpath($path);
+        if ($real === false) {
+            return false;
+        }
+        return $real . (\str_ends_with($path, '/') ? DIRECTORY_SEPARATOR : '');
     }
 
     /** @internal */
