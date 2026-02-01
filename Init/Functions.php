@@ -142,11 +142,19 @@ final class Functions
                 if (empty($headers)) {
                     return [];
                 }
+                $maxItems = 128;
                 foreach ((array)$headers as $name => $header) {
                     if (\is_string($name)) {
                         $result = [];
-                        foreach (\explode(',', $header) as $item) {
-                            $result[] = \trim($item);
+                        $header = (string)$header;
+                        if ($header !== '') {
+                            foreach (\explode(',', $header, $maxItems + 1) as $item) {
+                                $item = \trim($item);
+                                if ($item === '') {
+                                    continue;
+                                }
+                                $result[] = $item;
+                            }
                         }
                         $headers[$name] = $result;
                     } else {
