@@ -63,6 +63,9 @@ final readonly class LibraryServiceResources
         if (!$parts) {
             return false;
         }
+        if (\str_contains($parts[0], '..')) {
+            return false;
+        }
         $systemPath = SystemSettings::getRealPath('@library/' . $parts[0]);
         if (!$systemPath) {
             return false;
