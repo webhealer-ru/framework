@@ -660,6 +660,20 @@ class HlebBootstrap
         if (($server['REQUEST_METHOD'] ?? '') !== 'POST') {
             return null;
         }
+        
+        // Allow override only for classic HTML form submissions.
+        $contentType = (string)($server['CONTENT_TYPE'] ?? $server['HTTP_CONTENT_TYPE'] ?? '');
+        $mime = \strtolower(\trim(\strtok($contentType, ';') ?: ''));
+        if ($mime !== 'application/x-www-form-urlencoded' && $mime !== 'multipart/form-data') {
+            return null;
+        }
+        if (!empty($server['HTTP_TRANSFER_ENCODING'])) {
+            return null;
+        }
+        if (isset($server['CONTENT_LENGTH']) && $server['CONTENT_LENGTH'] !== '' && !\ctype_digit((string)$server['CONTENT_LENGTH'])) {
+            return null;
+        }
+        
         if (!isset($post['_method']) || !\is_string($post['_method'])) {
             return null;
         }
