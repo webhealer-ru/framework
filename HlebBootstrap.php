@@ -989,7 +989,11 @@ class HlebBootstrap
         if ($urlValidator->check()->isUrlCompare()) {
             return;
         }
-        async_exit('', 301, \array_merge(Response::getHeaders(), ['Location' => $urlValidator->getResultUrl()]));
+        $location = $urlValidator->getResultUrl();
+        if (\strpbrk($location, "\r\n\0") !== false) {
+            async_exit('Invalid URL', 400);
+        }
+        async_exit('', 301, \array_merge(Response::getHeaders(), ['Location' => $location]));
     }
 
     /**
